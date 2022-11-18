@@ -1,0 +1,5 @@
+/node_modules
+package-lock.json
+.VS_code
+.DS_Store
+.env
