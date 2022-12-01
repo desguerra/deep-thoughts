@@ -9,6 +9,7 @@ that we can perform requests more efficiently. */
 /* createHttpLink allows us to control how the Apollo Client makes a request. 
 Think of it like middleware for the outbound network requests. */
 import { ApolloProvider, ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -25,8 +26,19 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 const httpLink = createHttpLink({
   uri: '/graphql',
 });
+/* because we're not using the first parameter, but we still need to access the 
+second one, we can use an underscore to serve as a placeholder for the first param */
+const authLink = setContext((_, { headers }) => {
+  const token = localStorage.getItem('id_token');
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : '',
+    },
+  };
+});
 const client = new ApolloClient({
-  link: httpLink,
+  link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
 });
 
